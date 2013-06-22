@@ -124,6 +124,10 @@ bool Take::CheckHL(struct stat info)
     {
         return true;
     }
+    if (!(info.st_mode & S_IFREG))
+    {
+        return true;
+    }
     if (info.st_nlink < 2)
     {
         return true;
@@ -139,6 +143,10 @@ bool Take::CheckHL(string path)
     }
     struct stat info;
     stat(path.c_str(), &info);
+    if (!(info.st_mode & S_IFREG))
+    {
+        return true;
+    }
     if (info.st_nlink < 2)
     {
         return true;
