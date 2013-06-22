@@ -24,6 +24,8 @@ bool Preferences::StrictDevice = false;
 // If this is true, files with more than 1 hardlink are rejected
 bool Preferences::StrictHL = true;
 unsigned int Preferences::Device = 0;
+gid_t Preferences::Groups[256];
+int Preferences::NumberOfGroups = getgroups(sizeof(Preferences::Groups)/sizeof(Preferences::Groups[0]), Preferences::Groups);
 int Preferences::Verbosity = 0;
 bool Preferences::Recursive = false;
 bool Preferences::Group = false;

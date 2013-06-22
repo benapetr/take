@@ -33,6 +33,8 @@ class Preferences
         static bool StrictDevice;
         static bool StrictGroup;
         static string Version;
+        static int NumberOfGroups;
+        static gid_t Groups[256];
 };
 
 #endif // PREFERENCES_H

@@ -77,19 +77,24 @@ int Take::Callback(const char* path, const struct stat *sb, int typeflag, struct
 {
     string p = path;
     Debugging::DebugLog("Recursively overtaking " + p);
+    struct stat info;
+    stat(path, &info);
     if (Preferences::StrictDevice)
     {
-        struct stat info;
-        stat(path, &info);
         if (Preferences::Device != info.st_dev)
         {
             Debugging::WarningLog("Not overtaking " + p + " because it lives on a different filesystem");
             return 0;
         }
     }
-    if (!CheckHL(p))
+    if (!CheckHL(info))
     {
         Debugging::WarningLog("Not overtaking " + p + " because it has more than 1 hard link");
+        return 0;
+    }
+    if (!CheckGroups(info))
+    {
+        Debugging::WarningLog("Not overtaking " + p + " because you aren't member of its group");
         return 0;
     }
     ChangeOwner(p, Preferences::uid);
@@ -116,6 +121,35 @@ void Take::ChangeOwner(string path, uid_t owner)
     {
         Debugging::WarningLog("Unable to change owner of " + path);
     }
+}
+
+bool Take::CheckGroups(string path)
+{
+    if (!Preferences::StrictGroup)
+    {
+        return true;
+    }
+    struct stat info;
+    stat(path.c_str(), &info);
+    return CheckGroups(info);
+}
+
+bool Take::CheckGroups(struct stat info)
+{
+    if (!Preferences::StrictGroup)
+    {
+        return true;
+    }
+    int curr = 0;
+    while (curr < Preferences::NumberOfGroups)
+    {
+        if (info.st_gid == Preferences::Groups[curr])
+        {
+            return true;
+        }
+        curr++;
+    }
+    return false;
 }
 
 bool Take::CheckHL(struct stat info)
@@ -206,7 +240,7 @@ bool Take::Verify(string path)
     {
         if (Preferences::StrictGroup)
         {
-            if (Preferences::guid != info.st_gid)
+            if (!CheckGroups(info))
             {
                 Debugging::WarningLog("You aren't matching the group requirement");
                 return false;
