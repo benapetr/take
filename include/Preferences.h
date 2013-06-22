@@ -18,6 +18,7 @@ class Preferences
         static bool Group;
         static bool Recursive;
         static list<string> Objects;
+        static bool StrictGroup;
 };
 
 #endif // PREFERENCES_H

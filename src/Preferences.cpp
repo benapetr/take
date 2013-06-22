@@ -6,8 +6,10 @@
 
 using namespace std;
 
+bool Preferences::StrictGroup = false;
 int Preferences::Verbosity = 0;
 bool Preferences::Recursive = false;
+bool Preferences::Group = false;
 list<string> Preferences::Objects = list<string>();
 gid_t Preferences::guid = getgid();
 uid_t Preferences::uid = getuid();

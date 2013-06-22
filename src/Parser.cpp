@@ -11,7 +11,7 @@ Parser::Parser(int c, char *v[])
 
 void Parser::ShowHelp()
 {
-    cout << "Usage: take [-rhvg] [group] file [file2]..." << endl;
+    cout << "Usage: take [-rhvg] file [file2]..." << endl;
     cout << "take is overtaking the ownership and group of file or folder, in case its parent folder is owned by you" << endl << endl;
     cout << "Arguments:" << endl;
     cout << "  -h [--help]: Display this help" << endl;
@@ -25,7 +25,7 @@ bool Parser::Parse()
 {
     if (argc < 2)
     {
-        Debugging::Log("Usage: take [-rhvg] [group] file1 [file2]...");
+        Debugging::Log("Usage: take [-rhvg] file1 [file2]...");
         return true;
     }
 
@@ -39,7 +39,12 @@ bool Parser::Parse()
             ShowHelp();
             return true;
         }
-        if (parameter == "recursive" || parameter == "-r")
+        if (parameter == "--group" || parameter == "-g")
+        {
+            Preferences::Group = true;
+            continue;
+        }
+        if (parameter == "--recursive" || parameter == "-r")
         {
             Preferences::Recursive = true;
             continue;
@@ -73,6 +78,10 @@ bool Parser::Parse()
                 if ( parameter[c] == 'r' )
                 {
                     Preferences::Recursive = true;
+                }
+                if ( parameter[c] == 'g' )
+                {
+                    Preferences::Group = true;
                 }
                 c++;
             }

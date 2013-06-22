@@ -28,6 +28,11 @@ int main(int argc, char * argv[])
         Debugging::WarningLog("The binary is missing root suid!!!!!!!!");
     }
 
+    if (Preferences::Group)
+    {
+        Debugging::DebugLog("Will change the group as well");
+    }
+
     if (Preferences::Recursive)
     {
         Debugging::DebugLog("Operating in recursive mode for all files");
