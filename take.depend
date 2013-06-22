@@ -1,18 +1,22 @@
 # depslib dependency file v1.0
-1371896891 source:/home/petanb/Documents/sc/take/main.cpp
+1371901966 source:/home/petanb/Documents/sc/take/main.cpp
 	<iostream>
 	"include/Preferences.h"
 	"include/Debugging.h"
 	"include/Parser.h"
 	"include/Take.h"
 
-1371896148 source:/home/petanb/Documents/sc/take/src/Preferences.cpp
+1371900237 source:/home/petanb/Documents/sc/take/src/Preferences.cpp
 	<iostream>
 	<list>
+	<unistd.h>
+	<sys/stat.h>
 	"../include/Preferences.h"
 
-1371895814 /home/petanb/Documents/sc/take/include/Preferences.h
+1371903678 /home/petanb/Documents/sc/take/include/Preferences.h
 	<iostream>
+	<unistd.h>
+	<sys/stat.h>
 	<list>
 
 1371895001 source:/home/petanb/Documents/sc/take/src/Debugging.cpp
@@ -24,21 +28,24 @@
 	<iostream>
 	<string.h>
 
-1371895143 source:/home/petanb/Documents/sc/take/src/Take.cpp
+1371902035 source:/home/petanb/Documents/sc/take/src/Take.cpp
 	<iostream>
-	<pwd.h>
-	<grp.h>
+	<unistd.h>
+	<ftw.h>
+	<fnmatch.h>
 	<sys/stat.h>
+	"../include/Debugging.h"
+	"../include/Preferences.h"
 	"../include/Take.h"
 
-1371895219 /home/petanb/Documents/sc/take/include/Take.h
+1371903498 /home/petanb/Documents/sc/take/include/Take.h
 
-1371896687 source:/home/petanb/Documents/sc/take/src/Parser.cpp
+1371901827 source:/home/petanb/Documents/sc/take/src/Parser.cpp
 	<string.h>
 	"../include/Parser.h"
 	"../include/Preferences.h"
 	"../include/Debugging.h"
 
-1371896247 /home/petanb/Documents/sc/take/include/Parser.h
+1371897873 /home/petanb/Documents/sc/take/include/Parser.h
 	<iostream>
 

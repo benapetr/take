@@ -14,7 +14,7 @@ class Parser
     protected:
     private:
         int argc;
-        char *argv[];
+        char **argv;
         void ShowHelp();
 
 };

@@ -5,7 +5,8 @@
 
 Parser::Parser(int c, char *v[])
 {
-
+    argc = c;
+    argv = v;
 }
 
 void Parser::ShowHelp()
@@ -25,34 +26,65 @@ bool Parser::Parse()
     if (argc < 2)
     {
         Debugging::Log("Usage: take [-rhvg] [group] file1 [file2]...");
+        return true;
     }
 
     int curr = 1;
     while (curr < argc)
     {
         string parameter = argv[curr];
+        curr++;
         if (parameter == "-h" || parameter == "--help")
         {
             ShowHelp();
+            return true;
+        }
+        if (parameter == "recursive" || parameter == "-r")
+        {
+            Preferences::Recursive = true;
             continue;
         }
-        if (parameter.size() > 2 && parameter.substr(0, 2) == "-v")
+        if (parameter == "--")
         {
-            Preferences::Verbosity++;
-            unsigned int c = 2;
+            if (curr >= argc)
+            {
+                Debugging::WarningLog("parameter -- can't be used alone");
+                return true;
+            }
+            string parm = argv[curr];
+            curr++;
+            Preferences::Objects.push_back(parm);
+            continue;
+        }
+        if (parameter.size() > 1 && parameter.substr(0, 1) == "-")
+        {
+            unsigned int c = 1;
             while (c < parameter.size())
             {
-                if (parameter[c] != 'v' )
+                if ( parameter[c] == 'v' )
                 {
-                    break;
+                    Preferences::Verbosity++;
                 }
-                Preferences::Verbosity++;
+                if ( parameter[c] == 'h' )
+                {
+                    ShowHelp();
+                    return true;
+                }
+                if ( parameter[c] == 'r' )
+                {
+                    Preferences::Recursive = true;
+                }
                 c++;
             }
             continue;
         }
         Preferences::Objects.push_back(parameter);
-        curr++;
+    }
+
+    if (Preferences::Objects.empty())
+    {
+        Debugging::ErrorLog("You need to provide a list of files to overtake owner for");
+        return true;
     }
 
     return false;
