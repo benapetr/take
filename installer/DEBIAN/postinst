@@ -1,0 +1,5 @@
+#!/bin/sh
+chown root:root /usr/local/bin/take
+chmod 4755 /usr/local/bin/take
+
+exit 0

@@ -16,6 +16,7 @@
 
 using namespace std;
 
+string Preferences::Version = "1.0.0";
 bool Preferences::StrictGroup = false;
 int Preferences::Verbosity = 0;
 bool Preferences::Recursive = false;

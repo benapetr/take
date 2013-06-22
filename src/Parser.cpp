@@ -28,6 +28,7 @@ void Parser::ShowHelp()
     cout << "  -g [--group]: Overtake also a group, by default your primary group" << endl;
     cout << "  -v: Increases verbosity" << endl;
     cout << "  -r [--recursive]: Take files in a folder recursively" << endl << endl;
+    cout << "Take version " << Preferences::Version << endl << endl;
     cout << "This software is open source licensed under GPL v. 3, see https://github.com/benapetr/take" << endl;
 }
 
@@ -58,6 +59,11 @@ bool Parser::Parse()
         {
             Preferences::Recursive = true;
             continue;
+        }
+        if (parameter == "--version")
+        {
+            cout << "Take version: " << Preferences::Version << endl;
+            return true;
         }
         if (parameter == "--")
         {
