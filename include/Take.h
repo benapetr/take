@@ -12,7 +12,7 @@ class Take
     private:
         bool Overtake(string path);
         bool Verify(string path);
-        static int Callback(const char* path, const struct stat *sb, int typeflag);
+        static int Callback(const char* path, const struct stat *sb, int typeflag, struct FTW *ftwbuf);
         static void ChangeGroup(string path, gid_t owner);
         static void ChangeOwner(string path, uid_t owner);
 };
