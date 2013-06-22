@@ -199,7 +199,7 @@ bool Take::Verify(string path)
     stat(root.c_str(), &info);
     if (!CheckHL(path))
     {
-        Debugging::ErrorLog("File " + root + " contains more than 1 hardlink");
+        Debugging::ErrorLog("File " + path + " contains more than 1 hardlink");
         return false;
     }
     if (Preferences::uid == info.st_uid)
