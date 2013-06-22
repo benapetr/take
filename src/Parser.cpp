@@ -10,14 +10,21 @@ Parser::Parser(int c, char *v[])
 
 void Parser::ShowHelp()
 {
-
+    cout << "Usage: take [-rhvg] [group] file [file2]..." << endl;
+    cout << "take is overtaking the ownership and group of file or folder, in case its parent folder is owned by you" << endl << endl;
+    cout << "Arguments:" << endl;
+    cout << "  -h [--help]: Display this help" << endl;
+    cout << "  -g [--group]: Overtake also a group, by default your primary group" << endl;
+    cout << "  -v: Increases verbosity" << endl;
+    cout << "  -r [--recursive]: Take files in a folder recursively" << endl << endl;
+    cout << "This software is open source licensed under GPL v. 3, see https://github.com/benapetr/take" << endl;
 }
 
 bool Parser::Parse()
 {
     if (argc < 2)
     {
-        Debugging::Log("Usage: take [-rhvg] [group] file1, file2, folder...");
+        Debugging::Log("Usage: take [-rhvg] [group] file1 [file2]...");
     }
 
     int curr = 1;
