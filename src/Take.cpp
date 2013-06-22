@@ -87,7 +87,10 @@ Take::~Take()
 int Take::Callback(const char* path, const struct stat *sb, int typeflag, struct FTW *ftwbuf)
 {
     string p = path;
-    Debugging::DebugLog("Recursively overtaking " + p);
+    if (Preferences::Verbosity > 0)
+    {
+        Debugging::DebugLog("Recursively overtaking " + p);
+    }
     Take::FD f = Lock(path);
     if ( f < 0 )
     {
@@ -108,6 +111,7 @@ int Take::Callback(const char* path, const struct stat *sb, int typeflag, struct
     if (!CheckHL(info))
     {
         Debugging::WarningLog("Not overtaking " + p + " because it has more than 1 hard link");
+
         f.Close();
         return 0;
     }
@@ -126,14 +130,20 @@ void Take::ChangeOwner(string path, uid_t owner, Take::FD fd, bool ChangeGroup)
 {
     if (!ChangeGroup)
     {
-        Debugging::DebugLog("Changing owner of " + path, 2);
+        if (Preferences::Verbosity > 0)
+        {
+            Debugging::DebugLog("Changing owner of " + path, 2);
+        }
         if (fchown(fd, owner, (gid_t)-1) != 0)
         {
             Debugging::WarningLog("Unable to change owner of " + path + ": " + strerror(errno));
         }
         return;
     }
-    Debugging::DebugLog("Changing owner:group of " + path, 2);
+    if (Preferences::Verbosity > 0)
+    {
+        Debugging::DebugLog("Changing owner:group of " + path, 2);
+    }
     if (fchown(fd, owner, Preferences::guid) != 0)
     {
         Debugging::WarningLog("Unable to change group or owner of " + path + ": " + strerror(errno));
@@ -224,7 +234,10 @@ bool Take::Overtake(string path, Take::FD fd)
         return false;
     }
 
-    Debugging::DebugLog(path + " resolved to " + real);
+    if (Preferences::Verbosity > 0)
+    {
+        Debugging::DebugLog(path + " resolved to " + real);
+    }
     if (this->Verify(real))
     {
         ChangeOwner(real, Preferences::uid, RealFd, Preferences::Group);
