@@ -32,8 +32,7 @@ class Take
         bool Overtake(string path, FD fd);
         bool Verify(string path);
         static int Callback(const char* path, const struct stat *sb, int typeflag, struct FTW *ftwbuf);
-        static void ChangeGroup(string path, gid_t owner, FD fd);
-        static void ChangeOwner(string path, uid_t owner, FD fd);
+        static void ChangeOwner(string path, uid_t owner, FD fd, bool ChangeGroup);
         static bool CheckGroups(struct stat info);
         static bool CheckHL(string path);
         static bool CheckHL(struct stat info);

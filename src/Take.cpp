@@ -117,30 +117,26 @@ int Take::Callback(const char* path, const struct stat *sb, int typeflag, struct
         f.Close();
         return 0;
     }
-    ChangeOwner(p, Preferences::uid, f);
-    if (Preferences::Group)
-    {
-        ChangeGroup(p, Preferences::guid, f);
-    }
+    ChangeOwner(p, Preferences::uid, f, Preferences::Group);
     f.Close();
     return 0;
 }
 
-void Take::ChangeGroup(string path, gid_t owner, Take::FD fd)
+void Take::ChangeOwner(string path, uid_t owner, Take::FD fd, bool ChangeGroup)
 {
-    Debugging::DebugLog("Changing group of " + path, 2);
-    if (fchown(fd, (uid_t)-1, owner) != 0)
+    if (!ChangeGroup)
     {
-        Debugging::WarningLog("Unable to change group of " + path);
+        Debugging::DebugLog("Changing owner of " + path, 2);
+        if (fchown(fd, owner, (gid_t)-1) != 0)
+        {
+            Debugging::WarningLog("Unable to change owner of " + path + ": " + strerror(errno));
+        }
+        return;
     }
-}
-
-void Take::ChangeOwner(string path, uid_t owner, Take::FD fd)
-{
-    Debugging::DebugLog("Changing owner of " + path, 2);
-    if (fchown(fd, owner, (gid_t)-1) != 0)
+    Debugging::DebugLog("Changing owner:group of " + path, 2);
+    if (fchown(fd, owner, Preferences::Group) != 0)
     {
-        Debugging::WarningLog("Unable to change owner of " + path);
+        Debugging::WarningLog("Unable to change group or owner of " + path + ": " + strerror(errno));
     }
 }
 
@@ -231,11 +227,8 @@ bool Take::Overtake(string path, Take::FD fd)
     Debugging::DebugLog(path + " resolved to " + real);
     if (this->Verify(real))
     {
-        ChangeOwner(real, Preferences::uid, RealFd);
-        if (Preferences::Group)
-        {
-            ChangeGroup(real, Preferences::guid, RealFd);
-        }
+        ChangeOwner(real, Preferences::uid, RealFd, Preferences::Group);
+        RealFd.Close();
         return true;
     }
     Debugging::WarningLog("Not taking the ownership of " + real + " because you don't meet the requirements");
