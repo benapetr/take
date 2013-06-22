@@ -2,7 +2,7 @@ Package: Take
 Version: 1.0.0.0
 Section: security
 Priority: optional
-Architecture: all
+Architecture: amd64
 Essential: no
 Depends: libc6
 Recommends: 
