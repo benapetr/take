@@ -1,0 +1,44 @@
+# depslib dependency file v1.0
+1371895562 source:/home/petanb/Documents/sc/take/main.cpp
+	<iostream>
+	"include/Preferences.h"
+	"include/Debugging.h"
+	"include/Parser.h"
+	"include/Take.h"
+
+1371896148 source:/home/petanb/Documents/sc/take/src/Preferences.cpp
+	<iostream>
+	<list>
+	"../include/Preferences.h"
+
+1371895814 /home/petanb/Documents/sc/take/include/Preferences.h
+	<iostream>
+	<list>
+
+1371895001 source:/home/petanb/Documents/sc/take/src/Debugging.cpp
+	<iostream>
+	"../include/Preferences.h"
+	"../include/Debugging.h"
+
+1371894943 /home/petanb/Documents/sc/take/include/Debugging.h
+	<iostream>
+	<string.h>
+
+1371895143 source:/home/petanb/Documents/sc/take/src/Take.cpp
+	<iostream>
+	<pwd.h>
+	<grp.h>
+	<sys/stat.h>
+	"../include/Take.h"
+
+1371895219 /home/petanb/Documents/sc/take/include/Take.h
+
+1371896687 source:/home/petanb/Documents/sc/take/src/Parser.cpp
+	<string.h>
+	"../include/Parser.h"
+	"../include/Preferences.h"
+	"../include/Debugging.h"
+
+1371896247 /home/petanb/Documents/sc/take/include/Parser.h
+	<iostream>
+
