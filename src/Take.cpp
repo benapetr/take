@@ -197,7 +197,7 @@ bool Take::Verify(string path)
     Debugging::DebugLog(path + " parent directory: " + root);
     struct stat info;
     stat(root.c_str(), &info);
-    if (!CheckHL(info))
+    if (!CheckHL(path))
     {
         Debugging::ErrorLog("File " + root + " contains more than 1 hardlink");
         return false;
