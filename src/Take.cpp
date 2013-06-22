@@ -87,6 +87,11 @@ int Take::Callback(const char* path, const struct stat *sb, int typeflag, struct
             return 0;
         }
     }
+    if (!CheckHL(p))
+    {
+        Debugging::WarningLog("Not overtaking " + p + " because it has more than 1 hard link");
+        return 0;
+    }
     ChangeOwner(p, Preferences::uid);
     if (Preferences::Group)
     {
@@ -111,6 +116,34 @@ void Take::ChangeOwner(string path, uid_t owner)
     {
         Debugging::WarningLog("Unable to change owner of " + path);
     }
+}
+
+bool Take::CheckHL(struct stat info)
+{
+    if (!Preferences::StrictHL)
+    {
+        return true;
+    }
+    if (info.st_nlink < 2)
+    {
+        return true;
+    }
+    return false;
+}
+
+bool Take::CheckHL(string path)
+{
+    if (!Preferences::StrictHL)
+    {
+        return true;
+    }
+    struct stat info;
+    stat(path.c_str(), &info);
+    if (info.st_nlink < 2)
+    {
+        return true;
+    }
+    return false;
 }
 
 bool Take::Overtake(string path)
@@ -156,6 +189,11 @@ bool Take::Verify(string path)
     Debugging::DebugLog(path + " parent directory: " + root);
     struct stat info;
     stat(root.c_str(), &info);
+    if (!CheckHL(info))
+    {
+        Debugging::ErrorLog("File " + root + " contains more than 1 hardlink");
+        return false;
+    }
     if (Preferences::uid == info.st_uid)
     {
         if (Preferences::StrictGroup)

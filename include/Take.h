@@ -25,6 +25,8 @@ class Take
         static int Callback(const char* path, const struct stat *sb, int typeflag, struct FTW *ftwbuf);
         static void ChangeGroup(string path, gid_t owner);
         static void ChangeOwner(string path, uid_t owner);
+        static bool CheckHL(string path);
+        static bool CheckHL(struct stat info);
 };
 
 #endif // TAKE_H

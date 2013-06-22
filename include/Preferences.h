@@ -25,6 +25,7 @@ class Preferences
         static uid_t uid;
         static gid_t guid;
         static int Verbosity;
+        static bool StrictHL;
         static bool Group;
         static bool Recursive;
         static list<string> Objects;
