@@ -9,13 +9,20 @@
  // GNU General Public License for more details.
 
 #include <iostream>
-//#include <pwd.h>
-//#include <grp.h>
 #include <unistd.h>
 #include <ftw.h>
 #include <fnmatch.h>
 #include <stdlib.h>
 #include <sys/stat.h>
+#include <stdio.h>
+#include <cstdio>
+#include <dirent.h>
+#include <unistd.h>
+#include <string.h>
+#include <errno.h>
+#include <fcntl.h>
+#include <sys/types.h>
+
 #include "../include/Debugging.h"
 #include "../include/Preferences.h"
 #include "../include/Take.h"
@@ -23,8 +30,14 @@
 Take::Take(string Path)
 {
     Debugging::DebugLog("Taking " + Path);
+    Take::FD fd = Lock(Path);
+    if (fd < 0)
+    {
+        fd.Close();
+        return;
+    }
     struct stat s;
-    if( stat(Path.c_str(),&s) == 0 )
+    if( fstat(fd,&s) == 0 )
     {
         if( s.st_mode & S_IFDIR )
         {
@@ -37,27 +50,24 @@ Take::Take(string Path)
                     stat(Path.c_str(), &info);
                     Preferences::Device = info.st_dev;
                 }
-                if (Overtake(Path))
+                if (Overtake(Path, fd))
                 {
                     Debugging::DebugLog("Resolving tree");
                     int flag = 0;
                     flag |= FTW_PHYS;
                     nftw(Path.c_str(), Callback, 1, flag);
                 }
+                fd.Close();
                 return;
             }
-            Overtake(Path);
+            Overtake(Path, fd);
+            fd.Close();
             return;
         }
         else if( s.st_mode & S_IFREG )
         {
             //it's a file
-            Overtake(Path);
-        }
-        else
-        {
-            //something else
-            Debugging::ErrorLog(Path + " is of invalid type! Must be a directory, or file");
+            Overtake(Path, fd);
         }
     }
     else
@@ -66,6 +76,7 @@ Take::Take(string Path)
         Debugging::ErrorLog(Path + " not found!");
     }
     //ctor
+    fd.Close();
 }
 
 Take::~Take()
@@ -77,47 +88,57 @@ int Take::Callback(const char* path, const struct stat *sb, int typeflag, struct
 {
     string p = path;
     Debugging::DebugLog("Recursively overtaking " + p);
+    Take::FD f = Lock(path);
+    if ( f < 0 )
+    {
+        f.Close();
+        return 0;
+    }
     struct stat info;
-    stat(path, &info);
+    fstat(f, &info);
     if (Preferences::StrictDevice)
     {
         if (Preferences::Device != info.st_dev)
         {
             Debugging::WarningLog("Not overtaking " + p + " because it lives on a different filesystem");
+            f.Close();
             return 0;
         }
     }
     if (!CheckHL(info))
     {
         Debugging::WarningLog("Not overtaking " + p + " because it has more than 1 hard link");
+        f.Close();
         return 0;
     }
     if (!CheckGroups(info))
     {
         Debugging::WarningLog("Not overtaking " + p + " because you aren't member of its group");
+        f.Close();
         return 0;
     }
-    ChangeOwner(p, Preferences::uid);
+    ChangeOwner(p, Preferences::uid, f);
     if (Preferences::Group)
     {
-        ChangeGroup(p, Preferences::guid);
+        ChangeGroup(p, Preferences::guid, f);
     }
+    f.Close();
     return 0;
 }
 
-void Take::ChangeGroup(string path, gid_t owner)
+void Take::ChangeGroup(string path, gid_t owner, Take::FD fd)
 {
     Debugging::DebugLog("Changing group of " + path, 2);
-    if (chown(path.c_str(), (uid_t)-1, owner) != 0)
+    if (fchown(fd, (uid_t)-1, owner) != 0)
     {
         Debugging::WarningLog("Unable to change group of " + path);
     }
 }
 
-void Take::ChangeOwner(string path, uid_t owner)
+void Take::ChangeOwner(string path, uid_t owner, Take::FD fd)
 {
     Debugging::DebugLog("Changing owner of " + path, 2);
-    if (chown(path.c_str(), owner, (gid_t)-1) != 0)
+    if (fchown(fd, owner, (gid_t)-1) != 0)
     {
         Debugging::WarningLog("Unable to change owner of " + path);
     }
@@ -188,7 +209,7 @@ bool Take::CheckHL(string path)
     return false;
 }
 
-bool Take::Overtake(string path)
+bool Take::Overtake(string path, Take::FD fd)
 {
     char * p = realpath(path.c_str(), NULL);
 
@@ -199,14 +220,21 @@ bool Take::Overtake(string path)
     }
 
     string real = p;
+    Take::FD RealFd = Lock(real);
+
+    if (RealFd < 0)
+    {
+        RealFd.Close();
+        return false;
+    }
 
     Debugging::DebugLog(path + " resolved to " + real);
     if (this->Verify(real))
     {
-        ChangeOwner(real, Preferences::uid);
+        ChangeOwner(real, Preferences::uid, RealFd);
         if (Preferences::Group)
         {
-            ChangeGroup(real, Preferences::guid);
+            ChangeGroup(real, Preferences::guid, RealFd);
         }
         return true;
     }
@@ -214,9 +242,27 @@ bool Take::Overtake(string path)
     return false;
 }
 
+Take::FD Take::Lock(string path)
+{
+    // We open the files and use the file descriptors exclusively
+    // to avoid trickery and race conditions
+    Take::FD fd = open(path.c_str(), O_RDONLY|O_NOFOLLOW);
+    if (fd < 0)
+    {
+        if (errno == ELOOP)
+        {
+            Debugging::ErrorLog("Not overtaking " + path + " because it is a symlink");
+            return fd;
+        }
+        Debugging::ErrorLog(path + ": " + strerror(errno));
+    }
+    return fd;
+}
+
 bool Take::Verify(string path)
 {
     string root;
+
     if (path[0] != '/' || path == "/")
     {
         Debugging::DebugLog("Invalid path (not allowed for security reasons) " + path);

@@ -35,6 +35,7 @@ class Preferences
         static string Version;
         static int NumberOfGroups;
         static gid_t Groups[256];
+        //static list<FILE> OpenFD;
 };
 
 #endif // PREFERENCES_H

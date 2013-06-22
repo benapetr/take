@@ -29,6 +29,7 @@ int Preferences::NumberOfGroups = getgroups(sizeof(Preferences::Groups)/sizeof(P
 int Preferences::Verbosity = 0;
 bool Preferences::Recursive = false;
 bool Preferences::Group = false;
+//list<FILE> Preferences::OpenFD = list<FILE>();
 list<string> Preferences::Objects = list<string>();
 gid_t Preferences::guid = getgid();
 uid_t Preferences::uid = getuid();

@@ -9,6 +9,7 @@
  // GNU General Public License for more details.
 
 #include <iostream>
+#include <cstdio>
 #include "include/Preferences.h"
 #include "include/Debugging.h"
 #include "include/Parser.h"
@@ -54,6 +55,18 @@ int main(int argc, char * argv[])
     {
         Take *take = new Take(*iter);
         delete take;
+    }
+
+    // release all open FD
+
+    //if (!Preferences::OpenFD.empty())
+    {
+        //list<FILE>::iterator iter2;
+
+        //for(iter2 = Preferences::OpenFD.begin(); iter2 != Preferences::OpenFD.end(); iter2++)
+        //{
+        //    fclose(*iter2);
+        //}
     }
 
     return 0;

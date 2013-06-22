@@ -15,20 +15,30 @@ using namespace std;
 
 class Take
 {
+    struct FD
+    {
+        int fd;
+        FD(int f): fd(f)                { };
+        ~FD()                           { Close(); };
+        void Close()                    { if(fd >= 0) close(fd); };
+        operator int (void) const       { return fd; };
+    };
+
     public:
         Take(string Path);
         virtual ~Take();
     protected:
     private:
-        bool Overtake(string path);
+        bool Overtake(string path, FD fd);
         bool Verify(string path);
         static int Callback(const char* path, const struct stat *sb, int typeflag, struct FTW *ftwbuf);
-        static void ChangeGroup(string path, gid_t owner);
-        static void ChangeOwner(string path, uid_t owner);
+        static void ChangeGroup(string path, gid_t owner, FD fd);
+        static void ChangeOwner(string path, uid_t owner, FD fd);
         static bool CheckGroups(struct stat info);
         static bool CheckHL(string path);
         static bool CheckHL(struct stat info);
         static bool CheckGroups(string path);
+        static FD Lock(string path);
 };
 
 #endif // TAKE_H
