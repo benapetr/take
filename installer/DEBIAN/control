@@ -1,13 +1,12 @@
-Package: Take
+Package: take
 Version: 1.0.0.0
 Section: security
 Priority: optional
 Architecture: amd64
 Essential: no
 Depends: libc6
-Recommends: 
 Installed-Size: 1024
 Maintainer: Petr Bena <benapetr@gmail.com>
 Description: Take utility let you overtake files in folders which you own
- Take utility let you overtake files in folders which you own
+ Take utility let you overtake files in folders which you own.
  Licensed under GPL, report bugs to benapetr@gmail.com
