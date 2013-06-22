@@ -134,7 +134,7 @@ void Take::ChangeOwner(string path, uid_t owner, Take::FD fd, bool ChangeGroup)
         return;
     }
     Debugging::DebugLog("Changing owner:group of " + path, 2);
-    if (fchown(fd, owner, Preferences::Group) != 0)
+    if (fchown(fd, owner, Preferences::guid) != 0)
     {
         Debugging::WarningLog("Unable to change group or owner of " + path + ": " + strerror(errno));
     }

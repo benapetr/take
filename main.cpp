@@ -32,6 +32,7 @@ int main(int argc, char * argv[])
         cout << "Verbosity: " << Preferences::Verbosity << endl;
         cout << "DEBUG: your uid: " << Preferences::uid << endl;
         cout << "DEBUG: your euid: " << Preferences::euid << endl;
+        cout << "DEBUG: your gid: " << Preferences::guid << endl;
     }
 
     if (Preferences::euid > 0)
