@@ -17,8 +17,11 @@
 using namespace std;
 
 string Preferences::Version = "1.0.0";
+// If this is true, the file which is going to be overtaken must match the user's group as well
 bool Preferences::StrictGroup = false;
+// If this is true, subfiles which are going to be overtaken must be on same filesystem as root file
 bool Preferences::StrictDevice = false;
+// If this is true, files with more than 1 hardlink are rejected
 bool Preferences::StrictHL = true;
 unsigned int Preferences::Device = 0;
 int Preferences::Verbosity = 0;
