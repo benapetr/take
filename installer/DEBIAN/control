@@ -9,8 +9,5 @@ Recommends:
 Installed-Size: 1024
 Maintainer: Petr Bena <benapetr@gmail.com>
 Description: Take utility let you overtake files in folders which you own
-Take utility let you overtake files in folders which you own
-
-see https://github.com/benapetr/take
-
-Licensed under GPL, report bugs to benapetr@gmail.com
+ Take utility let you overtake files in folders which you own
+ Licensed under GPL, report bugs to benapetr@gmail.com
