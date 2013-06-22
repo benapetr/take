@@ -18,6 +18,8 @@ using namespace std;
 
 string Preferences::Version = "1.0.0";
 bool Preferences::StrictGroup = false;
+bool Preferences::StrictDevice = false;
+unsigned int Preferences::Device = 0;
 int Preferences::Verbosity = 0;
 bool Preferences::Recursive = false;
 bool Preferences::Group = false;

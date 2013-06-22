@@ -28,6 +28,8 @@ class Preferences
         static bool Group;
         static bool Recursive;
         static list<string> Objects;
+        static unsigned int Device;
+        static bool StrictDevice;
         static bool StrictGroup;
         static string Version;
 };

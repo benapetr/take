@@ -31,6 +31,12 @@ Take::Take(string Path)
             if (Preferences::Recursive)
             {
                 // we need to overtake it recursively
+                if (Preferences::StrictDevice)
+                {
+                    struct stat info;
+                    stat(Path.c_str(), &info);
+                    Preferences::Device = info.st_dev;
+                }
                 if (Overtake(Path))
                 {
                     Debugging::DebugLog("Resolving tree");
@@ -71,6 +77,16 @@ int Take::Callback(const char* path, const struct stat *sb, int typeflag, struct
 {
     string p = path;
     Debugging::DebugLog("Recursively overtaking " + p);
+    if (Preferences::StrictDevice)
+    {
+        struct stat info;
+        stat(path, &info);
+        if (Preferences::Device != info.st_dev)
+        {
+            Debugging::WarningLog("Not overtaking " + p + " because it lives on a different filesystem");
+            return 0;
+        }
+    }
     ChangeOwner(p, Preferences::uid);
     if (Preferences::Group)
     {
