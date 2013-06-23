@@ -29,7 +29,7 @@ void Parser::ShowHelp()
     cout << "  -v: Increases verbosity" << endl;
     cout << "  -r [--recursive]: Take files in a folder recursively" << endl << endl;
     cout << "Take version " << Preferences::Version << endl << endl;
-    cout << "This software is open source licensed under GPL v. 3, see https://github.com/benapetr/take" << endl;
+    cout << "This software is open source licensed under GPL v. 3, see https://github.com/benapetr/take for source code" << endl;
 }
 
 bool Parser::Parse()
@@ -69,7 +69,7 @@ bool Parser::Parse()
         {
             if (curr >= argc)
             {
-                Debugging::WarningLog("parameter -- can't be used alone");
+                Debugging::WarningLog("parameter -- can't be used without providing a name of some file or folder");
                 return true;
             }
             string parm = argv[curr];
