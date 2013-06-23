@@ -101,6 +101,7 @@ int Take::Callback(const char* path, const struct stat *sb, int typeflag, struct
     Take::FD f = Lock(path);
     if ( f < 0 )
     {
+        Preferences::RC = DEFAULT_EC;
         return 0;
     }
     struct stat info;
