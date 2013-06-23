@@ -27,9 +27,13 @@
 #include "../include/Preferences.h"
 #include "../include/Take.h"
 
+//! Number of total errors that happened during the run of take
 unsigned int Take::Errors = 0;
+//! Number of successful overtakes
 unsigned int Take::Successful = 0;
 
+//! Constructor for Take
+//! @param Path The path of the file to be overtaken
 Take::Take(string Path)
 {
     Debugging::DebugLog("Taking " + Path);
@@ -99,12 +103,17 @@ Take::Take(string Path)
     }
 }
 
+//! Desctuctor
 Take::~Take()
 {
     //dtor
 }
 
-// this is a function that is called for each recursively found object
+//! This is a function that is called for each recursively found object
+//! @param path Path of the file to overtake
+//! @param sb instance of file stat so that it doesn't need to be called twice
+//! @param typeflag type of file
+//! @param ftwbuf Buffer of ftw
 int Take::Callback(const char* path, const struct stat *sb, int typeflag, struct FTW *ftwbuf)
 {
     string p = path;
@@ -150,6 +159,11 @@ int Take::Callback(const char* path, const struct stat *sb, int typeflag, struct
     return 0;
 }
 
+//! Change owner of a file
+//! @param path Path of a file to change owner for
+//! @param owner uid of owner
+//! @param fd instance of FD which is related to a file
+//! @param ChangeGroup if this is true, the group of a file is changed to users's default group
 void Take::ChangeOwner(string path, uid_t owner, Take::FD fd, bool ChangeGroup)
 {
     if (!ChangeGroup)
@@ -174,6 +188,8 @@ void Take::ChangeOwner(string path, uid_t owner, Take::FD fd, bool ChangeGroup)
     }
 }
 
+//! Check if user is a member of group which owns the file
+//! @param path Path of a file to check
 bool Take::CheckGroups(string path)
 {
     if (!Preferences::StrictGroup)
@@ -185,6 +201,8 @@ bool Take::CheckGroups(string path)
     return CheckGroups(info);
 }
 
+//! Check if user is a member of group which owns the file
+//! @param info stat of file to check
 bool Take::CheckGroups(struct stat info)
 {
     if (!Preferences::StrictGroup)
@@ -203,6 +221,8 @@ bool Take::CheckGroups(struct stat info)
     return false;
 }
 
+//! This function check if file has max 1 hard link
+//! @param info Stat of file
 bool Take::CheckHL(struct stat info)
 {
     if (!Preferences::StrictHL)
@@ -220,6 +240,7 @@ bool Take::CheckHL(struct stat info)
     return false;
 }
 
+//! This function check if file has max 1 hard link
 bool Take::CheckHL(string path)
 {
     if (!Preferences::StrictHL)
@@ -239,6 +260,9 @@ bool Take::CheckHL(string path)
     return false;
 }
 
+//! This function attempt to overtake a file, it return true on success, otherwise false is returned
+//! @param path Path of a file - this is only used for debugging, the file mentioned in FD is changed
+//! @param fd File descriptor of a file which is supposed to be overtaken
 bool Take::Overtake(string path, Take::FD fd)
 {
     char * p = realpath(path.c_str(), NULL);
@@ -272,6 +296,8 @@ bool Take::Overtake(string path, Take::FD fd)
     return false;
 }
 
+//! This function open a FD for a file so that it is prevented from change
+//! @param path Path of a file to lock
 Take::FD Take::Lock(string path)
 {
     // We open the files and use the file descriptors exclusively
@@ -289,6 +315,8 @@ Take::FD Take::Lock(string path)
     return fd;
 }
 
+//! Check if user is eligible to overtake the file
+//! @param path Path of a file
 bool Take::Verify(string path)
 {
     string root;

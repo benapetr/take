@@ -20,13 +20,18 @@ using namespace std;
 
 int main(int argc, char * argv[])
 {
+    // we check the parameters of program
     Parser* parser = new Parser(argc, argv);
     if (parser->Parse())
     {
+        // when true is returned the application should exit
+        // this happen for example on --help
         delete parser;
         return 0;
     }
+    // we don't need to store parser in memory
     delete parser;
+    // if --verbose we print some info
     if (Preferences::Verbosity > 0)
     {
         cout << "Verbosity: " << Preferences::Verbosity << endl;
@@ -35,11 +40,13 @@ int main(int argc, char * argv[])
         cout << "DEBUG: your gid: " << Preferences::guid << endl;
     }
 
+    // in case the application isn't running as a root, we have problem
     if (Preferences::euid > 0)
     {
         Debugging::WarningLog("The binary is missing root suid!!!!!!!!");
     }
 
+    // Information that group will be changed
     if (Preferences::Group)
     {
         Debugging::DebugLog("Will change the group as well");

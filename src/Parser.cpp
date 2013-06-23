@@ -13,12 +13,14 @@
 #include "../include/Preferences.h"
 #include "../include/Debugging.h"
 
+//! Constructor of parser class
 Parser::Parser(int c, char *v[])
 {
     argc = c;
     argv = v;
 }
 
+//! Print a help for command
 void Parser::ShowHelp()
 {
     cout << "Usage: take [-rhvg] file [file2]..." << endl;
@@ -32,6 +34,7 @@ void Parser::ShowHelp()
     cout << "This software is open source licensed under GPL v. 3, see https://github.com/benapetr/take for source code" << endl;
 }
 
+//! Parse the parameters for program, return true if program is supposed to stop
 bool Parser::Parse()
 {
     if (argc < 2)
