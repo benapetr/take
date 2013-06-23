@@ -21,20 +21,21 @@ using namespace std;
 class Preferences
 {
     public:
-        static uid_t euid;
-        static uid_t uid;
-        static gid_t guid;
-        static int Verbosity;
-        static bool StrictHL;
-        static bool Group;
-        static bool Recursive;
-        static list<string> Objects;
-        static unsigned int Device;
-        static bool StrictDevice;
-        static bool StrictGroup;
-        static string Version;
-        static int NumberOfGroups;
-        static gid_t Groups[256];
+        static uid_t euid; // euid
+        static uid_t uid; // uid
+        static gid_t guid; // gid
+        static int Verbosity; // verbosity
+        static bool StrictHL; // strict check of hardlink
+        static bool Group; // group should be changed
+        static bool Recursive; // recursive
+        static list<string> Objects; // objects that needs to be overtaken
+        static unsigned int Device; // device the root folder live on
+        static bool StrictDevice; // check if device is same for all files
+        static bool StrictGroup; // strict check for user group
+        static string Version; // version
+        static int NumberOfGroups; // number of groups user is in
+        static gid_t Groups[256]; // list of all groups user is in
+        static int RC; // return code
 };
 
 #endif // PREFERENCES_H

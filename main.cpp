@@ -58,17 +58,5 @@ int main(int argc, char * argv[])
         delete take;
     }
 
-    // release all open FD
-
-    //if (!Preferences::OpenFD.empty())
-    {
-        //list<FILE>::iterator iter2;
-
-        //for(iter2 = Preferences::OpenFD.begin(); iter2 != Preferences::OpenFD.end(); iter2++)
-        //{
-        //    fclose(*iter2);
-        //}
-    }
-
-    return 0;
+    return Preferences::RC;
 }

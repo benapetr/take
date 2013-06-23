@@ -14,7 +14,7 @@
 	<sys/stat.h>
 	"../include/Preferences.h"
 
-1371930768 /home/petanb/Documents/sc/take/include/Preferences.h
+1371972728 /home/petanb/Documents/sc/take/include/Preferences.h
 	<iostream>
 	<unistd.h>
 	<sys/stat.h>
@@ -43,7 +43,7 @@
 
 1371971163 /home/petanb/Documents/sc/take/include/Take.h
 
-1371908118 source:/home/petanb/Documents/sc/take/src/Parser.cpp
+1371971599 source:/home/petanb/Documents/sc/take/src/Parser.cpp
 	<string.h>
 	"../include/Parser.h"
 	"../include/Preferences.h"

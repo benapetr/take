@@ -33,7 +33,6 @@ Take::Take(string Path)
     Take::FD fd = Lock(Path);
     if (fd < 0)
     {
-        fd.Close();
         return;
     }
     struct stat s;
@@ -57,27 +56,33 @@ Take::Take(string Path)
                     int flag = 0;
                     flag |= FTW_PHYS;
                     nftw(Path.c_str(), Callback, 1, flag);
+                } else
+                {
+                    Preferences::RC=1;
                 }
-                fd.Close();
                 return;
             }
-            Overtake(Path, fd);
-            fd.Close();
+            if (!Overtake(Path, fd))
+            {
+                Preferences::RC=1;
+            }
             return;
         }
         else if( s.st_mode & S_IFREG )
         {
             //it's a file
-            Overtake(Path, fd);
+            if (!Overtake(Path, fd))
+            {
+                Preferences::RC=1;
+            }
         }
     }
     else
     {
         //error
         Debugging::ErrorLog(Path + " not found!");
+        Preferences::RC=1;
     }
-    //ctor
-    fd.Close();
 }
 
 Take::~Take()
@@ -96,7 +101,6 @@ int Take::Callback(const char* path, const struct stat *sb, int typeflag, struct
     Take::FD f = Lock(path);
     if ( f < 0 )
     {
-        f.Close();
         return 0;
     }
     struct stat info;
@@ -105,25 +109,21 @@ int Take::Callback(const char* path, const struct stat *sb, int typeflag, struct
     {
         if (Preferences::Device != info.st_dev)
         {
-            Debugging::WarningLog("Not overtaking " + p + " because it lives on a different filesystem");
-            f.Close();
+            Debugging::ErrorLog("Not overtaking " + p + " because it lives on a different filesystem");
             return 0;
         }
     }
     if (!CheckHL(info))
     {
-        Debugging::WarningLog("Not overtaking " + p + " because it has more than 1 hard link");
-        f.Close();
+        Debugging::ErrorLog("Not overtaking " + p + " because it has more than 1 hard link");
         return 0;
     }
     if (!CheckGroups(info))
     {
-        Debugging::WarningLog("Not overtaking " + p + " because you aren't member of its group");
-        f.Close();
+        Debugging::ErrorLog("Not overtaking " + p + " because you aren't member of its group");
         return 0;
     }
     ChangeOwner(p, Preferences::uid, f, Preferences::Group);
-    f.Close();
     return 0;
 }
 
@@ -245,7 +245,7 @@ bool Take::Overtake(string path, Take::FD fd)
         RealFd.Close();
         return true;
     }
-    Debugging::WarningLog("Not taking the ownership of " + real + " because you don't meet the requirements");
+    Debugging::ErrorLog("Not taking the ownership of " + real + " because you don't meet the requirements");
     return false;
 }
 
