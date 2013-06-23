@@ -50,6 +50,7 @@ Take::Take(string Path)
                     stat(Path.c_str(), &info);
                     Preferences::Device = info.st_dev;
                 }
+                // attempt to overtake the root folder, which makes a check as well
                 if (Overtake(Path, fd))
                 {
                     Debugging::DebugLog("Resolving tree");
@@ -84,6 +85,7 @@ Take::~Take()
     //dtor
 }
 
+// this is a function that is called for each recursively found object
 int Take::Callback(const char* path, const struct stat *sb, int typeflag, struct FTW *ftwbuf)
 {
     string p = path;
@@ -111,7 +113,6 @@ int Take::Callback(const char* path, const struct stat *sb, int typeflag, struct
     if (!CheckHL(info))
     {
         Debugging::WarningLog("Not overtaking " + p + " because it has more than 1 hard link");
-
         f.Close();
         return 0;
     }

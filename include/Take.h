@@ -20,7 +20,7 @@ class Take
         int fd;
         FD(int f): fd(f)                { };
         ~FD()                           { Close(); };
-        void Close()                    { if(fd >= 0) close(fd); };
+        void Close()                    { if(fd >= 0) close(fd); fd = -1; };
         operator int (void) const       { return fd; };
     };
 
