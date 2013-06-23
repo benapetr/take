@@ -58,5 +58,10 @@ int main(int argc, char * argv[])
         delete take;
     }
 
+    if (Preferences::Verbosity >= 1)
+    {
+        cout << "Totally overtaken: " << Take::Successful << " errors: " << Take::Errors << endl;
+    }
+
     return Preferences::RC;
 }

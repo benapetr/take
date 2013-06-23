@@ -27,6 +27,9 @@
 #include "../include/Preferences.h"
 #include "../include/Take.h"
 
+unsigned int Take::Errors = 0;
+unsigned int Take::Successful = 0;
+
 Take::Take(string Path)
 {
     Debugging::DebugLog("Taking " + Path);
@@ -59,21 +62,31 @@ Take::Take(string Path)
                 } else
                 {
                     Preferences::RC = DEFAULT_EC;
+                    Errors++;
                 }
                 return;
             }
             if (!Overtake(Path, fd))
             {
                 Preferences::RC = DEFAULT_EC;
+                Errors++;
+            } else
+            {
+                Successful++;
             }
             return;
         }
         else if( s.st_mode & S_IFREG )
         {
             //it's a file
-            if (!Overtake(Path, fd))
+            if (Overtake(Path, fd))
+            {
+                Successful++;
+            }
+            else
             {
                 Preferences::RC = DEFAULT_EC;
+                Errors++;
             }
         }
     }
@@ -81,6 +94,7 @@ Take::Take(string Path)
     {
         //error
         Debugging::ErrorLog(Path + " not found!");
+        Errors++;
         Preferences::RC = DEFAULT_EC;
     }
 }
@@ -102,6 +116,7 @@ int Take::Callback(const char* path, const struct stat *sb, int typeflag, struct
     if ( f < 0 )
     {
         Preferences::RC = DEFAULT_EC;
+        Errors++;
         return 0;
     }
     struct stat info;
@@ -111,6 +126,7 @@ int Take::Callback(const char* path, const struct stat *sb, int typeflag, struct
         if (Preferences::Device != info.st_dev)
         {
             Debugging::ErrorLog("Not overtaking " + p + " because it lives on a different filesystem");
+            Errors++;
             Preferences::RC = DEFAULT_EC;
             return 0;
         }
@@ -118,6 +134,7 @@ int Take::Callback(const char* path, const struct stat *sb, int typeflag, struct
     if (!CheckHL(info))
     {
         Debugging::ErrorLog("Not overtaking " + p + " because it has more than 1 hard link");
+        Errors++;
         Preferences::RC = DEFAULT_EC;
         return 0;
     }
@@ -125,9 +142,11 @@ int Take::Callback(const char* path, const struct stat *sb, int typeflag, struct
     {
         Debugging::ErrorLog("Not overtaking " + p + " because you aren't member of its group");
         Preferences::RC = DEFAULT_EC;
+        Errors++;
         return 0;
     }
     ChangeOwner(p, Preferences::uid, f, Preferences::Group);
+    Successful++;
     return 0;
 }
 

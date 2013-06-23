@@ -25,6 +25,8 @@ class Take
     };
 
     public:
+        static unsigned int Successful;
+        static unsigned int Errors;
         Take(string Path);
         virtual ~Take();
     protected:
