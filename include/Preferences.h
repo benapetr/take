@@ -16,6 +16,8 @@
 #include <sys/stat.h>
 #include <list>
 
+#define DEFAULT_EC 1
+
 using namespace std;
 
 class Preferences

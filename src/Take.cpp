@@ -58,13 +58,13 @@ Take::Take(string Path)
                     nftw(Path.c_str(), Callback, 1, flag);
                 } else
                 {
-                    Preferences::RC=1;
+                    Preferences::RC = DEFAULT_EC;
                 }
                 return;
             }
             if (!Overtake(Path, fd))
             {
-                Preferences::RC=1;
+                Preferences::RC = DEFAULT_EC;
             }
             return;
         }
@@ -73,7 +73,7 @@ Take::Take(string Path)
             //it's a file
             if (!Overtake(Path, fd))
             {
-                Preferences::RC=1;
+                Preferences::RC = DEFAULT_EC;
             }
         }
     }
@@ -81,7 +81,7 @@ Take::Take(string Path)
     {
         //error
         Debugging::ErrorLog(Path + " not found!");
-        Preferences::RC=1;
+        Preferences::RC = DEFAULT_EC;
     }
 }
 
@@ -110,17 +110,20 @@ int Take::Callback(const char* path, const struct stat *sb, int typeflag, struct
         if (Preferences::Device != info.st_dev)
         {
             Debugging::ErrorLog("Not overtaking " + p + " because it lives on a different filesystem");
+            Preferences::RC = DEFAULT_EC;
             return 0;
         }
     }
     if (!CheckHL(info))
     {
         Debugging::ErrorLog("Not overtaking " + p + " because it has more than 1 hard link");
+        Preferences::RC = DEFAULT_EC;
         return 0;
     }
     if (!CheckGroups(info))
     {
         Debugging::ErrorLog("Not overtaking " + p + " because you aren't member of its group");
+        Preferences::RC = DEFAULT_EC;
         return 0;
     }
     ChangeOwner(p, Preferences::uid, f, Preferences::Group);
