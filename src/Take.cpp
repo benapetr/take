@@ -52,9 +52,7 @@ Take::Take(string Path)
                 // we need to overtake it recursively
                 if (Preferences::StrictDevice)
                 {
-                    struct stat info;
-                    stat(Path.c_str(), &info);
-                    Preferences::Device = info.st_dev;
+                    Preferences::Device = s.st_dev;
                 }
                 // attempt to overtake the root folder, which makes a check as well
                 if (Overtake(Path, fd))
