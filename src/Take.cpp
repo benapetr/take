@@ -55,7 +55,7 @@ Take::Take(string Path)
                     Preferences::Device = s.st_dev;
                 }
                 // attempt to overtake the root folder, which makes a check as well
-                if (Overtake(Path, fd))
+                if (Overtake(Path, &fd))
                 {
                     Debugging::DebugLog("Resolving tree");
                     int flag = 0;
@@ -68,7 +68,7 @@ Take::Take(string Path)
                 }
                 return;
             }
-            if (!Overtake(Path, fd))
+            if (!Overtake(Path, &fd))
             {
                 Preferences::RC = DEFAULT_EC;
                 Errors++;
@@ -81,7 +81,7 @@ Take::Take(string Path)
         else if( s.st_mode & S_IFREG )
         {
             //it's a file
-            if (Overtake(Path, fd))
+            if (Overtake(Path, &fd))
             {
                 Successful++;
             }
@@ -138,21 +138,21 @@ int Take::Callback(const char* path, const struct stat *sb, int typeflag, struct
             return 0;
         }
     }
-    if (!CheckHL(info))
+    if (!CheckHL(&info))
     {
         Debugging::ErrorLog("Not overtaking " + p + " because it has more than 1 hard link");
         Errors++;
         Preferences::RC = DEFAULT_EC;
         return 0;
     }
-    if (!CheckGroups(info))
+    if (!CheckGroups(&info))
     {
         Debugging::ErrorLog("Not overtaking " + p + " because you aren't member of its group");
         Preferences::RC = DEFAULT_EC;
         Errors++;
         return 0;
     }
-    ChangeOwner(p, Preferences::uid, f, Preferences::Group);
+    ChangeOwner(p, Preferences::uid, &f, Preferences::Group);
     Successful++;
     return 0;
 }
@@ -162,7 +162,7 @@ int Take::Callback(const char* path, const struct stat *sb, int typeflag, struct
 //! @param owner uid of owner
 //! @param fd instance of FD which is related to a file
 //! @param ChangeGroup if this is true, the group of a file is changed to users's default group
-void Take::ChangeOwner(string path, uid_t owner, Take::FD fd, bool ChangeGroup)
+void Take::ChangeOwner(string path, uid_t owner, Take::FD *fd, bool ChangeGroup)
 {
     if (!ChangeGroup)
     {
@@ -170,7 +170,7 @@ void Take::ChangeOwner(string path, uid_t owner, Take::FD fd, bool ChangeGroup)
         {
             Debugging::DebugLog("Changing owner of " + path, 2);
         }
-        if (fchown(fd, owner, (gid_t)-1) != 0)
+        if (fchown(fd->fd, owner, (gid_t)-1) != 0)
         {
             Debugging::WarningLog("Unable to change owner of " + path + ": " + strerror(errno));
         }
@@ -180,7 +180,7 @@ void Take::ChangeOwner(string path, uid_t owner, Take::FD fd, bool ChangeGroup)
     {
         Debugging::DebugLog("Changing owner:group of " + path, 2);
     }
-    if (fchown(fd, owner, Preferences::guid) != 0)
+    if (fchown(fd->fd, owner, Preferences::guid) != 0)
     {
         Debugging::WarningLog("Unable to change group or owner of " + path + ": " + strerror(errno));
     }
@@ -196,12 +196,12 @@ bool Take::CheckGroups(string path)
     }
     struct stat info;
     stat(path.c_str(), &info);
-    return CheckGroups(info);
+    return CheckGroups(&info);
 }
 
 //! Check if user is a member of group which owns the file
 //! @param info stat of file to check
-bool Take::CheckGroups(struct stat info)
+bool Take::CheckGroups(struct stat *info)
 {
     if (!Preferences::StrictGroup)
     {
@@ -210,7 +210,7 @@ bool Take::CheckGroups(struct stat info)
     int curr = 0;
     while (curr < Preferences::NumberOfGroups)
     {
-        if (info.st_gid == Preferences::Groups[curr])
+        if (info->st_gid == Preferences::Groups[curr])
         {
             return true;
         }
@@ -221,17 +221,17 @@ bool Take::CheckGroups(struct stat info)
 
 //! This function check if file has max 1 hard link
 //! @param info Stat of file
-bool Take::CheckHL(struct stat info)
+bool Take::CheckHL(struct stat *info)
 {
     if (!Preferences::StrictHL)
     {
         return true;
     }
-    if (!(info.st_mode & S_IFREG))
+    if (!(info->st_mode & S_IFREG))
     {
         return true;
     }
-    if (info.st_nlink < 2)
+    if (info->st_nlink < 2)
     {
         return true;
     }
@@ -261,7 +261,7 @@ bool Take::CheckHL(string path)
 //! This function attempt to overtake a file, it return true on success, otherwise false is returned
 //! @param path Path of a file - this is only used for debugging, the file mentioned in FD is changed
 //! @param fd File descriptor of a file which is supposed to be overtaken
-bool Take::Overtake(string path, Take::FD fd)
+bool Take::Overtake(string path, Take::FD *fd)
 {
     char * p = realpath(path.c_str(), NULL);
 
@@ -286,7 +286,7 @@ bool Take::Overtake(string path, Take::FD fd)
     }
     if (this->Verify(real))
     {
-        ChangeOwner(real, Preferences::uid, RealFd, Preferences::Group);
+        ChangeOwner(real, Preferences::uid, &RealFd, Preferences::Group);
         RealFd.Close();
         return true;
     }
@@ -342,7 +342,7 @@ bool Take::Verify(string path)
     {
         if (Preferences::StrictGroup)
         {
-            if (!CheckGroups(info))
+            if (!CheckGroups(&info))
             {
                 Debugging::WarningLog("You aren't matching the group requirement");
                 return false;

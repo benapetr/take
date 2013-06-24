@@ -31,13 +31,13 @@ class Take
         virtual ~Take();
     protected:
     private:
-        bool Overtake(string path, FD fd);
+        bool Overtake(string path, FD *fd);
         bool Verify(string path);
         static int Callback(const char* path, const struct stat *sb, int typeflag, struct FTW *ftwbuf);
-        static void ChangeOwner(string path, uid_t owner, FD fd, bool ChangeGroup);
-        static bool CheckGroups(struct stat info);
+        static void ChangeOwner(string path, uid_t owner, FD *fd, bool ChangeGroup);
+        static bool CheckGroups(struct stat *info);
         static bool CheckHL(string path);
-        static bool CheckHL(struct stat info);
+        static bool CheckHL(struct stat *info);
         static bool CheckGroups(string path);
         static FD Lock(string path);
 };
